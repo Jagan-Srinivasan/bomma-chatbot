@@ -139,4 +139,6 @@ def generate_ai_response(message, conversation_history):
         return f"Thanks for reaching out! I'm Bomma AI, and I'd love to help with that. Currently running in demo mode - to experience my full potential, please configure your Gemini API key in the Secrets tool."
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
+
