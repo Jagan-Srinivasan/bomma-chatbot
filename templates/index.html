@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bomma AI - Your Intelligent Assistant</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
 <body>
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
@@ -23,19 +24,6 @@
     </div>
 
     <div class="app-container">
-        <!-- Mobile Header -->
-        <div class="mobile-header">
-            <button id="sidebarToggle" class="sidebar-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="mobile-logo">
-                <div class="logo-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <span>Bomma AI</span>
-            </div>
-        </div>
-
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -67,9 +55,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Sidebar Overlay for Mobile -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
         <!-- Main Chat Area -->
         <div class="main-content">
@@ -118,18 +103,17 @@
 
                 <div class="input-container">
                     <div class="input-wrapper">
-                        <button id="voiceBtn" onclick="toggleVoiceRecording()" title="Voice input">
+                        <button id="voiceBtn" onclick="toggleVoiceRecording()" title="Voice Input">
                             <i class="fas fa-microphone"></i>
                         </button>
-                        <button id="imageBtn" onclick="document.getElementById('imageInput').click()" title="Upload image">
+                        <button id="imageBtn" onclick="document.getElementById('imageInput').click()" title="Upload Image">
                             <i class="fas fa-image"></i>
                         </button>
                         <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
                         <textarea 
                             id="messageInput" 
-                            placeholder="Ask Bomma AI anything..." 
+                            placeholder="Message Bomma AI..." 
                             rows="1"
-                            onkeydown="handleKeyDown(event)"
                         ></textarea>
                         <button id="sendBtn" onclick="sendMessage()" disabled>
                             <i class="fas fa-paper-plane"></i>
@@ -141,10 +125,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Footer -->
-    <div class="footer">
-        <p><small>&nbsp;&nbsp;&nbsp;       Powered by Gemini & Bomma AI</small></p>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
