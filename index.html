@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bomma AI - Your Intelligent Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <i class="fas fa-brain"></i>
+            </div>
+            <div class="loading-text">Bomma AI</div>
+            <div class="loading-dots">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <button id="sidebarToggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <span>Bomma AI</span>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h2 class="logo-text">Bomma AI</h2>
+                </div>
+                <button class="new-chat-btn" onclick="newChat()">
+                    <i class="fas fa-plus"></i>
+                    New Conversation
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="chat-history">
+                    <!-- Chat history will be populated here -->
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="clear-btn" onclick="clearHistory()">
+                    <i class="fas fa-trash-alt"></i>
+                    Clear History
+                </button>
+                <div class="powered-by">
+                    <small>Powered by Gemini AI</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Chat Area -->
+        <div class="main-content">
+            <div class="chat-header">
+                <div class="header-left">
+                    <div class="ai-avatar">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="header-info">
+                        <h1>Bomma AI</h1>
+                        <span class="model-info">Your Intelligent Assistant</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Online</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div class="messages-container" id="messages">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h2>Welcome to Bomma AI</h2>
+                        <p>Your intelligent assistant powered by advanced AI technology. I'm here to help you with information, coding, creative tasks, and thoughtful conversations.</p>
+                        <div class="features">
+                            <div class="feature">
+                                <i class="fas fa-code"></i>
+                                <span>Code Assistance</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Creative Solutions</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-book"></i>
+                                <span>Knowledge Base</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <button id="voiceBtn" onclick="toggleVoiceRecording()" title="Voice input">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button id="imageBtn" onclick="document.getElementById('imageInput').click()" title="Upload image">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Ask Bomma AI anything..." 
+                            rows="1"
+                            onkeydown="handleKeyDown(event)"
+                        ></textarea>
+                        <button id="sendBtn" onclick="sendMessage()" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="input-hint">
+                        <small>Press Enter to send, Shift+Enter for new line</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <div class="footer">
+        <p><small>&nbsp;&nbsp;&nbsp;       Powered by Gemini & Bomma AI</small></p>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
