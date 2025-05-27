@@ -1,3 +1,4 @@
+
 let isTyping = false;
 let isRecording = false;
 let recognition = null;
@@ -10,172 +11,98 @@ document.addEventListener('DOMContentLoaded', function() {
         loadConversation();
         setupInputHandlers();
         setupVoiceRecognition();
-        setupSidebarToggle();
-    }, 2000); // Show loading for 2 seconds
+        initializeMobileLayout();
+    }, 2000);
 });
 
 function showLoadingScreen() {
     const loadingScreen = document.getElementById('loadingScreen');
-    loadingScreen.style.display = 'flex';
+    if (loadingScreen) {
+        loadingScreen.style.display = 'flex';
+    }
 }
 
 function hideLoadingScreen() {
     const loadingScreen = document.getElementById('loadingScreen');
-    loadingScreen.classList.add('hidden');
-    setTimeout(() => {
-        loadingScreen.style.display = 'none';
-    }, 500);
+    if (loadingScreen) {
+        loadingScreen.classList.add('hidden');
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500);
+    }
 }
 
-function setupSidebarToggle() {
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function() {
-            toggleSidebar();
-        });
-    }
-
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', function() {
-            closeSidebar();
-        });
-    }
-
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', function(event) {
-        if (window.innerWidth <= 768) {
-            const isClickInsideSidebar = sidebar.contains(event.target);
-            const isClickOnToggle = sidebarToggle && sidebarToggle.contains(event.target);
-            
-            if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('open')) {
-                closeSidebar();
-            }
+function initializeMobileLayout() {
+    // Hide sidebar on mobile devices
+    if (window.innerWidth <= 768) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.style.display = 'none';
         }
-    });
-}
-
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    
-    sidebar.classList.toggle('open');
-    
-    if (sidebar.classList.contains('open')) {
-        sidebarOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-    } else {
-        sidebarOverlay.classList.remove('active');
-        document.body.style.overflow = '';
     }
-}
-
-function closeSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    
-    sidebar.classList.remove('open');
-    sidebarOverlay.classList.remove('active');
-    document.body.style.overflow = '';
 }
 
 function setupInputHandlers() {
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    messageInput.addEventListener('input', function() {
-        adjustTextareaHeight();
-        toggleSendButton();
-    });
+    if (messageInput && sendBtn) {
+        messageInput.addEventListener('input', function() {
+            sendBtn.disabled = !this.value.trim();
+            autoResize(this);
+        });
 
-    messageInput.addEventListener('paste', function() {
-        setTimeout(adjustTextareaHeight, 0);
-    });
-}
-
-function adjustTextareaHeight() {
-    const textarea = document.getElementById('messageInput');
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-}
-
-function toggleSendButton() {
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const hasText = messageInput.value.trim().length > 0;
-
-    sendBtn.disabled = !hasText || isTyping;
+        messageInput.addEventListener('keydown', handleKeyDown);
+    }
 }
 
 function setupVoiceRecognition() {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
-        
         recognition.continuous = false;
         recognition.interimResults = false;
         recognition.lang = 'en-US';
-        
-        recognition.onstart = function() {
-            isRecording = true;
-            const voiceBtn = document.getElementById('voiceBtn');
-            voiceBtn.classList.add('recording');
-            voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
-        };
-        
+
         recognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
             const messageInput = document.getElementById('messageInput');
-            messageInput.value = transcript;
-            adjustTextareaHeight();
-            toggleSendButton();
+            if (messageInput) {
+                messageInput.value = transcript;
+                document.getElementById('sendBtn').disabled = false;
+            }
         };
-        
+
+        recognition.onstart = function() {
+            isRecording = true;
+            const voiceBtn = document.getElementById('voiceBtn');
+            if (voiceBtn) {
+                voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                voiceBtn.classList.add('recording');
+            }
+        };
+
         recognition.onend = function() {
             isRecording = false;
             const voiceBtn = document.getElementById('voiceBtn');
-            voiceBtn.classList.remove('recording');
-            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            if (voiceBtn) {
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                voiceBtn.classList.remove('recording');
+            }
         };
-        
-        recognition.onerror = function(event) {
-            console.error('Speech recognition error:', event.error);
-            isRecording = false;
-            const voiceBtn = document.getElementById('voiceBtn');
-            voiceBtn.classList.remove('recording');
-            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-        };
-    } else {
-        // Hide voice button if not supported
-        const voiceBtn = document.getElementById('voiceBtn');
-        if (voiceBtn) {
-            voiceBtn.style.display = 'none';
-        }
-    }
-}
-
-function toggleVoiceRecording() {
-    if (!recognition) {
-        alert('Voice recognition is not supported in your browser.');
-        return;
-    }
-    
-    if (isRecording) {
-        recognition.stop();
-    } else {
-        recognition.start();
     }
 }
 
 function handleKeyDown(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
-        if (!isTyping && document.getElementById('messageInput').value.trim()) {
-            sendMessage();
-        }
+        sendMessage();
     }
+}
+
+function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
 }
 
 async function sendMessage() {
@@ -184,16 +111,11 @@ async function sendMessage() {
 
     if (!message || isTyping) return;
 
-    // Clear input and disable button
+    addMessage(message, 'user');
     messageInput.value = '';
-    adjustTextareaHeight();
-    toggleSendButton();
-    isTyping = true;
+    messageInput.style.height = 'auto';
+    document.getElementById('sendBtn').disabled = true;
 
-    // Add user message to chat
-    addMessage('user', message);
-
-    // Show typing indicator
     showTypingIndicator();
 
     try {
@@ -208,26 +130,22 @@ async function sendMessage() {
         const data = await response.json();
 
         if (response.ok) {
-            // Remove typing indicator and add AI response
-            removeTypingIndicator();
-            addMessage('assistant', data.response);
+            hideTypingIndicator();
+            addMessage(data.response, 'assistant');
         } else {
-            removeTypingIndicator();
-            addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+            hideTypingIndicator();
+            addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
         }
     } catch (error) {
-        removeTypingIndicator();
-        addMessage('assistant', 'Sorry, I encountered a network error. Please try again.');
+        hideTypingIndicator();
+        addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
     }
-
-    isTyping = false;
-    toggleSendButton();
 }
 
-function addMessage(role, content, timestamp = null, isImage = false) {
+function addMessage(content, role) {
     const messagesContainer = document.getElementById('messages');
+    if (!messagesContainer) return;
 
-    // Remove welcome message if it exists
     const welcomeMessage = messagesContainer.querySelector('.welcome-message');
     if (welcomeMessage) {
         welcomeMessage.remove();
@@ -238,208 +156,153 @@ function addMessage(role, content, timestamp = null, isImage = false) {
 
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
-    avatar.innerHTML = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-brain"></i>';
+
+    if (role === 'user') {
+        avatar.innerHTML = '<i class="fas fa-user"></i>';
+    } else {
+        avatar.innerHTML = '<i class="fas fa-brain"></i>';
+    }
 
     const messageContent = document.createElement('div');
     messageContent.className = 'message-content';
-
-    if (isImage) {
-        messageContent.innerHTML = `<img src="${content}" alt="Uploaded image" style="max-width: 300px; max-height: 300px; border-radius: 8px;">`;
-    } else if (role === 'assistant') {
-        messageContent.innerHTML = formatAIResponse(content);
-    } else {
-        // Keep user messages exactly as entered - no formatting
-        messageContent.textContent = content;
-    }
-
-    const timestampDiv = document.createElement('div');
-    timestampDiv.className = 'message-timestamp';
-    timestampDiv.textContent = timestamp ? formatTimestamp(new Date(timestamp)) : formatTimestamp(new Date());
+    messageContent.innerHTML = formatMessage(content);
 
     messageDiv.appendChild(avatar);
-    const contentWrapper = document.createElement('div');
-    contentWrapper.appendChild(messageContent);
-    contentWrapper.appendChild(timestampDiv);
-    messageDiv.appendChild(contentWrapper);
+    messageDiv.appendChild(messageContent);
 
     messagesContainer.appendChild(messageDiv);
-    scrollToBottom();
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-function formatAIResponse(content) {
-    // Convert text to HTML with proper formatting
-    let formatted = content;
-
-    // Handle code blocks
-    formatted = formatted.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-
-    // Handle inline code
-    formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-    // Handle numbered lists
-    formatted = formatted.replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>');
-
-    // Handle bullet points
-    formatted = formatted.replace(/^[•\-\*]\s+(.+)$/gm, '<li>$1</li>');
-
-    // Wrap consecutive list items in ul tags
-    formatted = formatted.replace(/(<li>.*<\/li>)/gs, (match) => {
-        return '<ul>' + match + '</ul>';
-    });
-
-    // Handle paragraphs (split by double newlines)
-    const paragraphs = formatted.split(/\n\s*\n/);
-    formatted = paragraphs.map(p => {
-        p = p.trim();
-        if (p && !p.startsWith('<')) {
-            return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
-        }
-        return p;
-    }).join('');
-
-    // Handle bold text
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-    // Handle italic text
-    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-    return formatted;
+function formatMessage(content) {
+    return content
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
 }
 
 function showTypingIndicator() {
+    isTyping = true;
     const messagesContainer = document.getElementById('messages');
+    if (!messagesContainer) return;
+
     const typingDiv = document.createElement('div');
-    typingDiv.className = 'message assistant';
-    typingDiv.id = 'typing-indicator';
+    typingDiv.className = 'message assistant typing-indicator';
+    typingDiv.id = 'typingIndicator';
 
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
     avatar.innerHTML = '<i class="fas fa-brain"></i>';
 
     const typingContent = document.createElement('div');
-    typingContent.className = 'typing-indicator';
-    typingContent.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    typingContent.className = 'message-content';
+    typingContent.innerHTML = '<div class="typing-dots"><div></div><div></div><div></div></div>';
 
     typingDiv.appendChild(avatar);
     typingDiv.appendChild(typingContent);
+
     messagesContainer.appendChild(typingDiv);
-    scrollToBottom();
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-function removeTypingIndicator() {
-    const typingIndicator = document.getElementById('typing-indicator');
+function hideTypingIndicator() {
+    isTyping = false;
+    const typingIndicator = document.getElementById('typingIndicator');
     if (typingIndicator) {
         typingIndicator.remove();
     }
 }
 
-function scrollToBottom() {
-    const messagesContainer = document.getElementById('messages');
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-function formatTimestamp(date) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-async function loadConversation() {
-    try {
-        const response = await fetch('/api/conversations');
-        const data = await response.json();
-
-        if (data.messages && data.messages.length > 0) {
-            const messagesContainer = document.getElementById('messages');
-            const welcomeMessage = messagesContainer.querySelector('.welcome-message');
-            if (welcomeMessage) {
-                welcomeMessage.remove();
-            }
-
-            data.messages.forEach(message => {
-                addMessageFromHistory(message.role, message.content, message.timestamp);
-            });
-        }
-    } catch (error) {
-        console.error('Failed to load conversation:', error);
+function toggleVoiceRecording() {
+    if (!recognition) {
+        alert('Voice recognition is not supported in your browser.');
+        return;
     }
-}
 
-function addMessageFromHistory(role, content, timestamp) {
-    const messagesContainer = document.getElementById('messages');
-
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${role}`;
-
-    const avatar = document.createElement('div');
-    avatar.className = 'message-avatar';
-    avatar.innerHTML = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-brain"></i>';
-
-    const messageContent = document.createElement('div');
-    messageContent.className = 'message-content';
-    if (role === 'assistant') {
-        messageContent.innerHTML = formatAIResponse(content);
+    if (isRecording) {
+        recognition.stop();
     } else {
-        // Keep user messages exactly as entered - no formatting
-        messageContent.textContent = content;
+        recognition.start();
     }
-
-    const timestampDiv = document.createElement('div');
-    timestampDiv.className = 'message-timestamp';
-    timestampDiv.textContent = formatTimestamp(new Date(timestamp));
-
-    messageDiv.appendChild(avatar);
-    const contentWrapper = document.createElement('div');
-    contentWrapper.appendChild(messageContent);
-    contentWrapper.appendChild(timestampDiv);
-    messageDiv.appendChild(contentWrapper);
-
-    messagesContainer.appendChild(messageDiv);
 }
 
 async function newChat() {
     try {
-        await fetch('/api/new-chat', { method: 'POST' });
+        const response = await fetch('/api/new-chat', {
+            method: 'POST'
+        });
 
-        // Clear the messages container
-        const messagesContainer = document.getElementById('messages');
-        messagesContainer.innerHTML = `
-            <div class="welcome-message">
-                <div class="welcome-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <h2>Welcome to Bomma AI</h2>
-                <p>Your intelligent assistant powered by advanced AI technology. Start a conversation by typing a message below.</p>
-            </div>
-        `;
-
-        // Clear input
-        document.getElementById('messageInput').value = '';
-        adjustTextareaHeight();
-        toggleSendButton();
-
+        if (response.ok) {
+            const messagesContainer = document.getElementById('messages');
+            if (messagesContainer) {
+                messagesContainer.innerHTML = `
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h2>Welcome to Bomma AI</h2>
+                        <p>Your intelligent assistant powered by advanced AI technology. I'm here to help you with information, coding, creative tasks, and thoughtful conversations.</p>
+                        <div class="features">
+                            <div class="feature">
+                                <i class="fas fa-code"></i>
+                                <span>Code Assistance</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Creative Solutions</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-book"></i>
+                                <span>Knowledge Base</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
     } catch (error) {
-        console.error('Failed to start new chat:', error);
+        console.error('Error starting new chat:', error);
     }
 }
 
 async function clearHistory() {
-    if (confirm('Are you sure you want to clear the chat history? This action cannot be undone.')) {
+    if (confirm('Are you sure you want to clear the chat history?')) {
         try {
-            await fetch('/api/clear-history', { method: 'POST' });
+            const response = await fetch('/api/clear-history', {
+                method: 'POST'
+            });
 
-            // Clear the messages container
-            const messagesContainer = document.getElementById('messages');
-            messagesContainer.innerHTML = `
-                <div class="welcome-message">
-                    <div class="welcome-icon">
-                        <i class="fas fa-brain"></i>
-                </div>
-                <h2>Welcome to Bomma AI</h2>
-                <p>Your intelligent assistant powered by advanced AI technology. Start a conversation by typing a message below.</p>
-                </div>
-            `;
-
+            if (response.ok) {
+                const messagesContainer = document.getElementById('messages');
+                if (messagesContainer) {
+                    messagesContainer.innerHTML = `
+                        <div class="welcome-message">
+                            <div class="welcome-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h2>Welcome to Bomma AI</h2>
+                            <p>Your intelligent assistant powered by advanced AI technology. I'm here to help you with information, coding, creative tasks, and thoughtful conversations.</p>
+                            <div class="features">
+                                <div class="feature">
+                                    <i class="fas fa-code"></i>
+                                    <span>Code Assistance</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Creative Solutions</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-book"></i>
+                                    <span>Knowledge Base</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
         } catch (error) {
-            console.error('Failed to clear history:', error);
+            console.error('Error clearing history:', error);
         }
     }
 }
@@ -450,12 +313,10 @@ function handleImageUpload(event) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const imageDataUrl = e.target.result;
-            addMessage('user', imageDataUrl, null, true);
+            addImageMessage(imageDataUrl, 'user');
             
-            // You can extend this to send the image to the backend
-            // For now, just show a response from the AI
             setTimeout(() => {
-                addMessage('assistant', 'I can see the image you uploaded! However, image analysis functionality is not fully implemented yet. I can help you with text-based questions and conversations.');
+                addMessage('I can see the image you uploaded! However, image analysis functionality is not fully implemented yet. I can help you with text-based questions and conversations.', 'assistant');
             }, 1000);
         };
         reader.readAsDataURL(file);
@@ -464,5 +325,60 @@ function handleImageUpload(event) {
         event.target.value = '';
     } else {
         alert('Please select a valid image file.');
+    }
+}
+
+function addImageMessage(imageDataUrl, role) {
+    const messagesContainer = document.getElementById('messages');
+    if (!messagesContainer) return;
+
+    const welcomeMessage = messagesContainer.querySelector('.welcome-message');
+    if (welcomeMessage) {
+        welcomeMessage.remove();
+    }
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.innerHTML = '<i class="fas fa-user"></i>';
+
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    
+    const img = document.createElement('img');
+    img.src = imageDataUrl;
+    img.style.maxWidth = '300px';
+    img.style.maxHeight = '300px';
+    img.style.borderRadius = '8px';
+    img.style.objectFit = 'cover';
+    
+    messageContent.appendChild(img);
+
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(messageContent);
+
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+async function loadConversation() {
+    try {
+        const response = await fetch('/api/conversations');
+        const data = await response.json();
+
+        if (data.messages && data.messages.length > 0) {
+            const messagesContainer = document.getElementById('messages');
+            if (messagesContainer) {
+                messagesContainer.innerHTML = '';
+
+                data.messages.forEach(message => {
+                    addMessage(message.content, message.role);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading conversation:', error);
     }
 }
