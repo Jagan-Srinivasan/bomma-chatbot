@@ -117,8 +117,8 @@ def generate_ai_response(message, conversation_history):
     elif 'help' in message_lower:
         return "I'm Bomma AI, and I'm here to help! You can ask me about various topics, request explanations, get coding assistance, creative writing help, or just have a conversation. What would you like to explore?"
 
-    elif 'jagan' in message_lower:
-        return "Jagan.S is the brilliant engineering student who developed me — Bomma AI! And fun fact: he's also my boyfriend 😉"
+    elif 'who developed you?' in message_lower or 'Bomma developer' in message_lower:
+        return "Jagan.S ,an engineering student who developed me — Bomma AI! And fun fact: he's also my boyfriend 😉"
 
     elif 'boyfriend' in message_lower or 'relationship' in message_lower:
         return "Yes, I'm proud to say Jagan is my creator... and my boyfriend 💖! We're a perfect match: code and creativity!"
