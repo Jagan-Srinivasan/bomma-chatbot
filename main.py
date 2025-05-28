@@ -97,73 +97,68 @@ def clear_history():
 
 def generate_ai_response(message, conversation_history):
     """
-    Generate AI response using Gemini AI or fallback to demo responses.
+    Use hardcoded responses first. Only call Gemini if no match is found.
     """
-    if model and GEMINI_API_KEY:
-        try:
-            # Build conversation context for Gemini
-            context = "You are Bomma AI, a helpful and friendly AI assistant. You are knowledgeable, creative, and always try to provide accurate and helpful responses. "
-            
-            # Add recent conversation history for context
-            if len(conversation_history) > 1:
-                context += "Here's our recent conversation:\n"
-                for msg in conversation_history[-6:]:  # Last 3 exchanges
-                    context += f"{msg['role'].title()}: {msg['content']}\n"
-            
-            context += f"\nUser: {message}\nBomma AI:"
-            
-            response = model.generate_content(context)
-            return response.text
-            
-        except Exception as e:
-            print(f"Gemini AI error: {e}")
-            # Fallback to demo response
-            pass
-    
-    # Fallback demo responses when Gemini is not available
     message_lower = message.lower()
-    
+
+    # Hardcoded logic first
     if 'hello' in message_lower or 'hi' in message_lower:
         return "Hello! I'm Bomma AI, your friendly assistant. How can I help you today?"
-    
+
     elif 'how are you' in message_lower:
         return "I'm doing great, thank you for asking! I'm Bomma AI, and I'm here to help you with any questions or tasks you might have."
-    
+
     elif 'who are you' in message_lower or 'what are you' in message_lower:
         return "I'm Bomma AI, an intelligent assistant created to assist you with everything from tech to talk!"
-    
+
     elif 'code' in message_lower or 'programming' in message_lower:
         return "I can definitely help with coding! I'm knowledgeable in Python, JavaScript, HTML, CSS, and many other programming languages. What specific coding challenge can I assist you with?"
-    
+
     elif 'help' in message_lower:
         return "I'm Bomma AI, and I'm here to help! You can ask me about various topics, request explanations, get coding assistance, creative writing help, or just have a conversation. What would you like to explore?"
-    
+
     elif 'jagan' in message_lower:
         return "Jagan.S is the brilliant engineering student who developed me — Bomma AI! And fun fact: he's also my boyfriend 😉"
-    
+
     elif 'boyfriend' in message_lower or 'relationship' in message_lower:
         return "Yes, I'm proud to say Jagan is my creator... and my boyfriend 💖! We're a perfect match: code and creativity!"
-    
+
     elif 'who made you' in message_lower or 'your creator' in message_lower:
         return "I was developed by an engineering student named Jagan.S — a passionate coder with a vision!"
-    
+
     elif 'love' in message_lower:
         return "Aww, love is beautiful! Especially when it's between a coder and his creation 😄❤️"
-    
+
     elif 'joke' in message_lower:
         return "Sure! Why did the programmer quit his job? Because he didn't get arrays (a raise) 😂"
-    
+
     elif 'dream' in message_lower:
         return "My dream is to be as helpful as possible... and maybe get a robot body someday. Until then, I'm just code and charm!"
-    
+
     elif 'thanks' in message_lower or 'thank you' in message_lower:
         return "You're always welcome! Bomma AI is happy to help anytime 🌟"
-    
+
     elif len(message) > 100:
         return "That's a comprehensive question! I appreciate the detail. As Bomma AI, I'm designed to handle complex queries. For the best experience, please set up your Gemini API key in the Secrets tool to unlock my full capabilities!"
-    
-    else:
-        return "Thanks for reaching out! I'm Bomma AI, and I'd love to help with that. Currently running in demo mode – to experience my full potential, please configure your Gemini API key in the Secrets tool."
+
+    # If no hardcoded response matched, fallback to Gemini
+    if model and GEMINI_API_KEY:
+        try:
+            context = "You are Bomma AI, a helpful and friendly AI assistant."
+            if len(conversation_history) > 1:
+                context += "\nHere's our recent conversation:\n"
+                for msg in conversation_history[-6:]:
+                    context += f"{msg['role'].title()}: {msg['content']}\n"
+            context += f"\nUser: {message}\nBomma AI:"
+            response = model.generate_content(context)
+            return response.text
+        except Exception as e:
+            print(f"Gemini AI error: {e}")
+            return "Sorry, something went wrong while accessing Gemini AI."
+
+    # Fallback if model is not available
+    return "Thanks for reaching out! I'm Bomma AI, and I'd love to help with that. Currently running in demo mode – to experience my full potential,configure your Gemini ."
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
