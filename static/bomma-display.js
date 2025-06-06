@@ -16,4 +16,4 @@ function switchWelcomeMessage() {
 }
 
 // Set interval to change the message every 3 seconds
-setInterval(switchWelcomeMessage, 3000);
+setInterval(switchWelcomeMessage, 2000);
