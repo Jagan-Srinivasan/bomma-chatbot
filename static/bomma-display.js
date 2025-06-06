@@ -1,15 +1,19 @@
-// Three versions of the word "Bomma" in English, Telugu, and Tamil
-const bommaVersions = ["Bomma", "బొమ్మ", "பொம்மா"]; // English, Telugu, Tamil
+// Three versions of "Welcome to Bomma AI" in English, Telugu, and Tamil
+const welcomeMessages = [
+    "Welcome to Bomma AI", // English
+    " Welcome to బొమ్మ AI" , // Telugu
+    "Welcome to பொம்மா AI "  // Tamil
+];
 
-// Target element to display the word
-const displayElement = document.getElementById("bomma-word");
+// Target element to display the message
+const welcomeElement = document.getElementById("bomma-welcome");
 
-// Function to switch between versions
+// Function to switch between messages
 let index = 0;
-function switchBomma() {
-    displayElement.textContent = bommaVersions[index];
-    index = (index + 1) % bommaVersions.length; // Cycle through versions
+function switchWelcomeMessage() {
+    welcomeElement.textContent = welcomeMessages[index];
+    index = (index + 1) % welcomeMessages.length; // Cycle through messages
 }
 
-// Set interval to change the word every 2 seconds
-setInterval(switchBomma, 3000);
+// Set interval to change the message every 3 seconds
+setInterval(switchWelcomeMessage, 3000);
