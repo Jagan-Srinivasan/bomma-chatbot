@@ -12,4 +12,4 @@ function switchBomma() {
 }
 
 // Set interval to change the word every 2 seconds
-setInterval(switchBomma, 2000);
+setInterval(switchBomma, 3000);
