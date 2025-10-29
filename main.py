@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this'
 
 # Configure Gemini AI
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') or 'AIzaSyBuWr2BQGvYvG8Sbheqd7cjZyTtnaIr0SU'
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') or 'AIzaSyDftwcLNbGzb0guzpvoe--rTx3Cdb7rNpg'
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel('gemini-1.5-flash')
