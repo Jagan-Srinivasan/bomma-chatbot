@@ -2,7 +2,7 @@
 const welcomeMessages = [
     "Welcome to Bomma AI", // English
     " Welcome to బొమ్మ AI" , // Telugu
-    "Welcome to பொம்மா AI "  // Tamil
+    "Welcome to Bomma AI "  // Tamil
 ];
 
 // Target element to display the message
