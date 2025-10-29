@@ -5,7 +5,7 @@ import os
 
 # AnyModel abstraction - currently only Gemini is implemented
 class AnyModel:
-    def __init__(self, gemini_api_key=None):
+    def __init__(self, gemini_api_key= AIzaSyDftwcLNbGzb0guzpvoe--rTx3Cdb7rNpg):
         self.gemini_api_key = gemini_api_key or os.getenv("GEMINI_API_KEY")
         self.gemini_available = False
         self.gemini_model = None
