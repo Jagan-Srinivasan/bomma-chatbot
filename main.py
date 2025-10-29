@@ -1,15 +1,36 @@
 from flask import Flask, render_template, request, jsonify, session
 import uuid
 import datetime
+import os
 
-# Your Gemini API key (hardcoded for reliability)
+# Your Gemini API key (hardcoded for reliability, but you could use os.environ too)
 GEMINI_API_KEY = "AIzaSyDftwcLNbGzb0guzpvoe--rTx3Cdb7rNpg"
 
-# Try to initialize Gemini model
+# Set your preferred model name here, or leave as None to auto-select
+PREFERRED_GEMINI_MODEL = os.environ.get("PREFERRED_GEMINI_MODEL", "gemini-pro")
+
+# Try to initialize Gemini model, list available models, and select one
 try:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    available_models = []
+    for m in genai.list_models():
+        # Only include models that support content generation
+        if "generateContent" in getattr(m, "supported_generation_methods", []):
+            available_models.append(m.name)
+    print("Available Gemini models for your API key:")
+    for m in available_models:
+        print(" -", m)
+    # Pick the preferred model, or the first available
+    if PREFERRED_GEMINI_MODEL in available_models:
+        selected_model_name = PREFERRED_GEMINI_MODEL
+    elif available_models:
+        selected_model_name = available_models[0]
+        print(f"WARNING: Preferred model '{PREFERRED_GEMINI_MODEL}' not found. Using '{selected_model_name}' instead.")
+    else:
+        raise Exception("No available Gemini models for content generation with this API key.")
+    model = genai.GenerativeModel(selected_model_name)
+    print(f"Using Gemini model: {selected_model_name}")
 except Exception as e:
     print("Gemini initialization error:", e)
     model = None
