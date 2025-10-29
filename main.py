@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, jsonify, session
 import uuid
 import datetime
 
-# -- HARD CODED GEMINI API KEY --
+# Your Gemini API key (hardcoded for reliability)
 GEMINI_API_KEY = "AIzaSyDftwcLNbGzb0guzpvoe--rTx3Cdb7rNpg"
 
-# -- GEMINI INIT --
+# Try to initialize Gemini model
 try:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
@@ -17,12 +17,12 @@ except Exception as e:
 app = Flask(__name__)
 app.secret_key = "bomma-secret"
 
-# In-memory conversation store
+# In-memory conversation store (use a DB for production)
 conversations = {}
 
 @app.route('/')
 def index():
-    return "<h1>Bomma Chatbot Running</h1>"
+    return render_template('index.html')
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -53,7 +53,7 @@ def chat():
     }
     conversations[conversation_id]['messages'].append(user_message)
 
-    # -- HARDCODED RESPONSES (as before) --
+    # Hardcoded responses first
     response_text = hardcoded_response(message)
     if not response_text:
         response_text = call_gemini(message, conversations[conversation_id]['messages'])
@@ -137,4 +137,4 @@ def clear_history():
     return jsonify({'success': True})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000, debug=True)
+    app.run(host='0.0.0.0', port=10000)
