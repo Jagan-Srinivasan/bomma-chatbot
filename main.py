@@ -4,7 +4,7 @@ import datetime
 import os
 
 # Your Gemini API key (hardcoded for reliability, but you could use os.environ too)
-GEMINI_API_KEY = "AIzaSyDftwcLNbGzb0guzpvoe--rTx3Cdb7rNpg"
+GEMINI_API_KEY = "AIzaSyArOx6ivpQzHORKdOsNqiBfYZIfBq2S7x4"
 
 # Set your preferred model name here, or leave as None to auto-select
 PREFERRED_GEMINI_MODEL = os.environ.get("PREFERRED_GEMINI_MODEL", "gemini-pro")
