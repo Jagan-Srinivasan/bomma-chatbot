@@ -5,8 +5,9 @@ import os
 
 # AnyModel abstraction - currently only Gemini is implemented
 class AnyModel:
-    def __init__(self, gemini_api_key= AIzaSyDftwcLNbGzb0guzpvoe--rTx3Cdb7rNpg):
-        self.gemini_api_key = gemini_api_key or os.getenv("GEMINI_API_KEY")
+    def __init__(self, gemini_api_key=None):
+        # Use the provided API key or fall back to env variable
+        self.gemini_api_key = gemini_api_key or os.getenv("GEMINI_API_KEY") or "AIzaSyDftwcLNbGzb0guzpvoe--rTx3Cdb7rNpg"
         self.gemini_available = False
         self.gemini_model = None
         if self.gemini_api_key:
@@ -38,7 +39,7 @@ class AnyModel:
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-change-this')
 
-model = AnyModel()  # Uses GEMINI_API_KEY from env or hardcoded if present
+model = AnyModel()  # Uses your Gemini API key
 
 # In-memory storage for conversations (for production, use persistent storage)
 conversations = {}
